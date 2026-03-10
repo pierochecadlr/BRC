@@ -181,7 +181,7 @@ export default function AdminPanel() {
                     <td className="px-5 py-3 text-xs text-ink-400 font-mono">{new Date(c.created_at).toLocaleDateString()}</td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-1.5">
-                        <Link to={`/cases/${c.id}`}
+                        <Link to={`/caso/${c.id}`}
                           className="p-1.5 border border-ink-200 text-ink-600 hover:border-navy-400 hover:text-navy-700 transition-colors">
                           <Eye size={12} />
                         </Link>
@@ -219,13 +219,13 @@ export default function AdminPanel() {
               <tbody>
                 {MOCK_CASES.map((c) => (
                   <tr key={c.id} className="border-b border-ink-50 hover:bg-ink-50 transition-colors">
-                    <td className="px-5 py-3 text-xs text-ink-400 font-mono">#{c.id.padStart(4, '0')}</td>
+                    <td className="px-5 py-3 text-xs text-ink-400 font-mono">#{c.id}</td>
                     <td className="px-5 py-3 text-sm font-semibold text-navy-900 max-w-[200px] truncate">{c.empresa}</td>
                     <td className="px-5 py-3 text-sm text-ink-500">{c.ciudad}</td>
                     <td className="px-5 py-3"><RiskBadge level={c.riesgo} /></td>
                     <td className="px-5 py-3 text-xs text-ink-400 font-mono">{new Date(c.created_at).toLocaleDateString()}</td>
                     <td className="px-5 py-3">
-                      <Link to={`/cases/${c.id}`}
+                      <Link to={`/caso/${c.id}`}
                         className="p-1.5 border border-ink-200 text-ink-600 hover:border-navy-400 hover:text-navy-700 transition-colors inline-flex">
                         <Eye size={12} />
                       </Link>

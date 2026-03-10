@@ -68,7 +68,7 @@ export default function CaseReport() {
   if (!caso) return (
     <div className="max-w-5xl mx-auto px-4 py-20 text-center text-ink-400">
       <p>{t('case_detail.not_found')}</p>
-      <Link to="/cases" className="mt-4 inline-flex items-center gap-2 text-navy-700 font-medium hover:underline">
+      <Link to="/buscar" className="mt-4 inline-flex items-center gap-2 text-navy-700 font-medium hover:underline">
         <ArrowLeft size={14} /> {t('case_detail.back')}
       </Link>
     </div>
@@ -78,7 +78,7 @@ export default function CaseReport() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       {/* Controls */}
       <div className="flex items-center justify-between mb-6 no-print">
-        <Link to={`/cases/${caso.id}`}
+        <Link to={`/caso/${caso.id}`}
           className="flex items-center gap-2 text-sm font-medium text-navy-700 hover:text-navy-900 transition-colors">
           <ArrowLeft size={14} /> {t('report.back')}
         </Link>

@@ -83,10 +83,14 @@ CREATE POLICY "Public read contacts"
   ON contacts FOR SELECT
   USING (true);
 
+-- Anyone can read submissions
+CREATE POLICY "Public read submissions"
+  ON submissions FOR SELECT
+  USING (true);
+
 -- Anyone can submit (insert) a new submission
 CREATE POLICY "Public insert submissions"
-  ON submissions FOR SELECT, INSERT
-  USING (true)
+  ON submissions FOR INSERT
   WITH CHECK (true);
 
 -- ── Storage bucket for submission files ───────────────────────

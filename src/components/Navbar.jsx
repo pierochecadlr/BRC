@@ -9,16 +9,12 @@ export default function Navbar() {
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
 
-  // Normalise — browser may give 'en-US', 'es-MX', etc.
   const lang = i18n.language?.startsWith('es') ? 'es' : 'en'
 
-  const switchTo = lang === 'es' ? 'en' : 'es'
-  const toggleLang = () => i18n.changeLanguage(switchTo)
-
   const links = [
-    { to: '/',       label: t('nav.home') },
-    { to: '/cases',  label: t('nav.cases') },
-    { to: '/submit', label: t('nav.submit') },
+    { to: '/',           label: t('nav.home') },
+    { to: '/buscar',     label: t('nav.cases') },
+    { to: '/nuevo-caso', label: t('nav.submit') },
   ]
 
   const isActive = (to) => to === '/' ? pathname === '/' : pathname.startsWith(to)
@@ -31,7 +27,7 @@ export default function Navbar() {
           {/* Wordmark */}
           <Link to="/" className="flex-shrink-0 flex items-baseline gap-2">
             <span className="text-white font-black text-lg tracking-tight">
-              BRC<span className="text-crimson-500">.</span>
+              BRC<span className="text-teal-400">check</span>
             </span>
             <span className="text-navy-500 text-xs font-medium hidden sm:inline">
               {t('nav.tagline')}
@@ -56,32 +52,23 @@ export default function Navbar() {
 
           {/* Right */}
           <div className="flex items-center gap-5 ml-auto">
-
-            {/* Language switcher — shows both, highlights current */}
+            {/* Language switcher */}
             <div className="flex items-center gap-1 text-xs font-bold uppercase tracking-widest">
               <button
                 onClick={() => lang !== 'es' && i18n.changeLanguage('es')}
                 className={clsx(
                   'px-1.5 py-0.5 transition-colors',
-                  lang === 'es'
-                    ? 'text-white border-b border-white'
-                    : 'text-navy-500 hover:text-navy-300'
+                  lang === 'es' ? 'text-white border-b border-white' : 'text-navy-500 hover:text-navy-300'
                 )}
-              >
-                ES
-              </button>
+              >ES</button>
               <span className="text-navy-700">|</span>
               <button
                 onClick={() => lang !== 'en' && i18n.changeLanguage('en')}
                 className={clsx(
                   'px-1.5 py-0.5 transition-colors',
-                  lang === 'en'
-                    ? 'text-white border-b border-white'
-                    : 'text-navy-500 hover:text-navy-300'
+                  lang === 'en' ? 'text-white border-b border-white' : 'text-navy-500 hover:text-navy-300'
                 )}
-              >
-                EN
-              </button>
+              >EN</button>
             </div>
 
             <Link to="/admin"
@@ -113,7 +100,6 @@ export default function Navbar() {
             className="block py-2.5 text-xs text-navy-600">
             {t('nav.admin')}
           </Link>
-          {/* Language switcher in mobile */}
           <div className="flex items-center gap-3 pt-3 mt-1 border-t border-navy-800">
             {['es', 'en'].map(l => (
               <button key={l} onClick={() => { i18n.changeLanguage(l); setOpen(false) }}

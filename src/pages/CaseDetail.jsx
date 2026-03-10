@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ExternalLink, Download, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Download, CheckCircle, Sparkles, Loader } from 'lucide-react'
 import RiskBadge from '../components/RiskBadge'
-import { MOCK_CASES, lf } from '../lib/mockData'
+import { MOCK_CASES, MOCK_COMPANIES, lf } from '../lib/mockData'
+import { generateCaseSummary } from '../lib/claude'
 
 function fmt(d) {
   try { return new Date(d).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) }
@@ -19,18 +20,115 @@ function SectionHeading({ children }) {
   )
 }
 
+function DueProcessTimeline({ steps, lang }) {
+  return (
+    <div className="flex items-center flex-wrap gap-0">
+      {steps.map((s, i) => (
+        <div key={i} className="flex items-center">
+          <div className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold ${
+            s.status === 'done'    ? 'text-green-700 bg-green-50 border border-green-200' :
+            s.status === 'active'  ? 'text-teal-700 bg-teal-50 border border-teal-300' :
+            'text-ink-300 bg-white border border-ink-100'
+          }`}>
+            <span>{s.status === 'done' ? '✓' : s.status === 'active' ? '●' : '○'}</span>
+            <span>{lf(s.label, lang)}</span>
+            {s.fecha && s.status === 'done' && (
+              <span className="text-[9px] opacity-60">{new Date(s.fecha).toLocaleDateString()}</span>
+            )}
+          </div>
+          {i < steps.length - 1 && (
+            <div className="w-6 h-px bg-ink-200 flex-shrink-0" />
+          )}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function PactumPanel({ nivel, status, lang, t }) {
+  const levels = [
+    { n: 1, key: 'l1', label: { es: 'Negociación', en: 'Negotiation' }, desc: { es: 'Resolución directa entre partes', en: 'Direct resolution between parties' } },
+    { n: 2, key: 'l2', label: { es: 'Mediación',   en: 'Mediation' },   desc: { es: 'Facilitador neutral',           en: 'Neutral facilitator' } },
+    { n: 3, key: 'l3', label: { es: 'Arbitraje',   en: 'Arbitration' }, desc: { es: 'Decisión vinculante',           en: 'Binding decision' } },
+    { n: 4, key: 'l4', label: { es: 'Litigio',     en: 'Litigation' },  desc: { es: 'Proceso judicial',              en: 'Court proceedings' } },
+  ]
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {levels.map(l => {
+        const isActive = l.n === nivel && status === 'active'
+        const isDone   = status === 'resolved' || l.n < nivel
+        return (
+          <div key={l.n} className={`p-3 border transition-colors ${
+            isActive ? 'border-teal-400 bg-teal-50' :
+            isDone   ? 'border-green-200 bg-green-50' :
+            'border-ink-100 bg-white'
+          }`}>
+            <p className={`text-xs font-bold ${isActive ? 'text-teal-700' : isDone ? 'text-green-700' : 'text-ink-400'}`}>
+              L{l.n} — {lf(l.label, lang)}
+            </p>
+            <p className="text-[10px] text-ink-400 mt-0.5">{lf(l.desc, lang)}</p>
+            {isActive && <span className="text-[9px] font-black text-teal-600 uppercase mt-1 block">● {t('pactum.active')}</span>}
+            {isDone && status !== 'resolved' && <span className="text-[9px] font-black text-green-600 uppercase mt-1 block">✓</span>}
+            {status === 'resolved' && <span className="text-[9px] font-black text-green-600 uppercase mt-1 block">✓ {t('pactum.resolved')}</span>}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function EvidenceQuality({ ev, lang, t }) {
+  const checks = [
+    { key: 'tiene_fecha', label: { es: 'Tiene fecha', en: 'Has date' } },
+    { key: 'firmado',     label: { es: 'Firmado',     en: 'Signed' } },
+    { key: 'validacion_cruzada', label: { es: 'Validación cruzada', en: 'Cross-validated' } },
+  ]
+  const score = ev.quality?.score ?? 0
+  const color = score >= 80 ? '#1A7A4A' : score >= 50 ? '#C8922A' : '#C0392B'
+  const nivelLabel = score >= 80 ? t('evidence_quality.level_robusto') : score >= 50 ? t('evidence_quality.level_solido') : score >= 25 ? t('evidence_quality.level_basico') : t('evidence_quality.level_insuficiente')
+  return (
+    <div className="mt-2 pl-3 border-l-2 border-ink-100">
+      <div className="flex items-center gap-2 mb-1">
+        <div className="h-1 flex-1 bg-ink-100">
+          <div className="h-full" style={{ width: `${score}%`, backgroundColor: color }} />
+        </div>
+        <span className="text-[9px] font-bold uppercase" style={{ color }}>{nivelLabel} {score}%</span>
+      </div>
+      <div className="flex gap-3">
+        {checks.map(c => (
+          <span key={c.key} className={`text-[9px] font-semibold ${ev.quality?.[c.key] ? 'text-green-600' : 'text-ink-300'}`}>
+            {ev.quality?.[c.key] ? '✓' : '✗'} {lf(c.label, lang)}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function CaseDetail() {
   const { id } = useParams()
   const { t, i18n } = useTranslation()
   const lang = i18n.language?.startsWith('es') ? 'es' : 'en'
   const caso = MOCK_CASES.find(c => c.id === id)
+  const company = caso ? MOCK_COMPANIES.find(co => co.id === caso.empresa_id) : null
   const [reply, setReply] = useState({ name: '', company: '', email: '', message: '' })
-  const [sent, setSent] = useState(false)
+  const [sent, setSent]   = useState(false)
+  const [summary, setSummary]     = useState('')
+  const [loadingAI, setLoadingAI] = useState(false)
+
+  async function handleGenerateSummary() {
+    if (!caso) return
+    setLoadingAI(true)
+    const rawFacts = `Empresa: ${caso.empresa}. Contraparte: ${caso.contraparte}. Conflicto: ${lf(caso.conflicto, lang)}. Impacto: ${caso.impacto}. Descripción: ${lf(caso.descripcion, lang)}`
+    const result = await generateCaseSummary(rawFacts, lang)
+    setSummary(result)
+    setLoadingAI(false)
+  }
 
   if (!caso) return (
     <div className="max-w-5xl mx-auto px-5 py-20 text-center text-ink-400">
       <p className="font-medium">{t('case_detail.not_found')}</p>
-      <Link to="/cases" className="mt-3 inline-flex items-center gap-1 text-sm text-navy-700 hover:underline">
+      <Link to="/buscar" className="mt-3 inline-flex items-center gap-1 text-sm text-teal-600 hover:underline">
         <ArrowLeft size={13} /> {t('case_detail.back')}
       </Link>
     </div>
@@ -39,9 +137,13 @@ export default function CaseDetail() {
   return (
     <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10">
 
-      <Link to="/cases" className="inline-flex items-center gap-1.5 text-xs text-ink-400 hover:text-navy-700 transition-colors mb-6">
-        <ArrowLeft size={12} /> {t('case_detail.back')}
-      </Link>
+      <div className="flex items-center gap-3 mb-6">
+        <Link to={`/empresa/${caso.empresa_id}`} className="inline-flex items-center gap-1.5 text-xs text-ink-400 hover:text-teal-600 transition-colors">
+          <ArrowLeft size={12} /> {caso.empresa}
+        </Link>
+        <span className="text-ink-200">/</span>
+        <span className="text-xs text-ink-400 font-mono">{caso.folio}</span>
+      </div>
 
       {/* Header */}
       <div className="bg-white border border-ink-200 p-6 mb-1">
@@ -49,19 +151,22 @@ export default function CaseDetail() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <RiskBadge level={caso.riesgo} size="md" />
-              <span className="text-xs text-ink-400 font-mono">#{caso.id.padStart(4, '0')}</span>
+              <span className="text-xs text-ink-400 font-mono">{caso.folio}</span>
             </div>
-            <h1 className="text-2xl font-bold text-navy-950 leading-snug">{lf(caso.titulo, lang)}</h1>
+            <h1 className="text-xl font-bold text-navy-950 leading-snug">{lf(caso.titulo, lang)}</h1>
           </div>
-          <Link to={`/cases/${caso.id}/report`} className="btn-primary flex items-center gap-2 flex-shrink-0">
+          <Link to={`/caso/${caso.id}/report`} className="btn-primary flex items-center gap-2 flex-shrink-0">
             <Download size={13} /> PDF
           </Link>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-ink-500">
           <span>{caso.empresa}</span>
+          <span>vs.</span>
+          <span className="font-semibold text-ink-700">{caso.contraparte}</span>
+          <span>·</span>
           <span>{caso.ciudad}</span>
+          <span>·</span>
           <span>{fmt(caso.created_at)}</span>
-          <span className="font-semibold text-ink-700">{lf(caso.conflicto, lang)}</span>
         </div>
       </div>
 
@@ -83,7 +188,6 @@ export default function CaseDetail() {
           <div>
             <SectionHeading>{t('case_detail.section_summary')}</SectionHeading>
             <p className="text-sm text-ink-700 leading-relaxed mb-6">{lf(caso.descripcion, lang)}</p>
-
             <div className="grid grid-cols-2 gap-3">
               {[
                 [t('case_detail.conflicto'), lf(caso.conflicto, lang)],
@@ -97,53 +201,58 @@ export default function CaseDetail() {
                 </div>
               ))}
             </div>
-
-            {caso.empresas_vinculadas?.length > 0 && (
-              <div className="mt-5">
-                <p className="section-label mb-2">{t('case_detail.empresas_vinculadas')}</p>
-                <div className="flex flex-wrap gap-2">
-                  {caso.empresas_vinculadas.map(e => (
-                    <span key={e} className="text-xs border border-navy-200 text-navy-700 px-3 py-1 bg-navy-50">
-                      {e}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
-          {/* Evidence & Sources */}
+          {/* Due Process Engine */}
+          <div>
+            <SectionHeading>{t('modules.due_process')}</SectionHeading>
+            <DueProcessTimeline steps={caso.due_process} lang={lang} />
+          </div>
+
+          {/* Evidence Vault */}
           {caso.evidencia?.length > 0 && (
             <div>
-              <SectionHeading>{t('case_detail.section_evidence')}</SectionHeading>
-              <div className="space-y-px">
+              <SectionHeading>{t('modules.evidence_vault')}</SectionHeading>
+              <div className="space-y-3">
                 {caso.evidencia.map((ev, i) => (
-                  <div key={i}
-                    className="flex items-center justify-between bg-white border border-ink-100 px-4 py-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <span className="text-[10px] font-black uppercase px-1.5 py-0.5 flex-shrink-0 bg-navy-100 text-navy-700">
+                  <div key={i} className="bg-white border border-ink-100 px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] font-black uppercase px-1.5 py-0.5 bg-navy-100 text-navy-700 flex-shrink-0">
                         {ev.tipo}
                       </span>
-                      <div className="min-w-0">
-                        <p className="text-sm text-ink-700 truncate">{lf(ev.titulo, lang)}</p>
-                        <p className="text-[10px] text-ink-400 font-semibold">{ev.fuente}</p>
-                      </div>
+                      <p className="text-sm text-ink-700 flex-1">{lf(ev.titulo, lang)}</p>
+                      <span className="text-[10px] text-ink-400 font-semibold flex-shrink-0">{ev.fuente}</span>
                     </div>
-                    <a href={ev.url} target="_blank" rel="noopener noreferrer"
-                       className="text-ink-400 hover:text-navy-700 transition-colors flex-shrink-0 ml-3">
-                      <ExternalLink size={14} />
-                    </a>
+                    {ev.quality && <EvidenceQuality ev={ev} lang={lang} t={t} />}
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Right of reply */}
+          {/* AI Case Summary */}
+          <div>
+            <SectionHeading>{t('ai.summary_title')}</SectionHeading>
+            {summary ? (
+              <div className="bg-teal-50 border border-teal-200 p-4 text-sm text-teal-900 leading-relaxed">
+                {summary}
+              </div>
+            ) : (
+              <button
+                onClick={handleGenerateSummary}
+                disabled={loadingAI}
+                className="flex items-center gap-2 px-4 py-2.5 border border-teal-300 text-teal-700 text-sm font-semibold hover:bg-teal-50 transition-colors disabled:opacity-50"
+              >
+                {loadingAI ? <Loader size={14} className="animate-spin" /> : <Sparkles size={14} />}
+                {loadingAI ? t('ai.generating') : t('ai.generate_summary')}
+              </button>
+            )}
+          </div>
+
+          {/* Right of Reply */}
           <div>
             <SectionHeading>{t('case_detail.section_reply')}</SectionHeading>
             <p className="text-sm text-ink-500 mb-5">{t('case_detail.reply_subtitle')}</p>
-
             {sent ? (
               <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 px-5 py-4">
                 <CheckCircle size={16} className="text-emerald-600 flex-shrink-0" />
@@ -154,24 +263,20 @@ export default function CaseDetail() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="label">{t('case_detail.reply_name')}</label>
-                    <input required className="input" value={reply.name}
-                      onChange={e => setReply(p => ({ ...p, name: e.target.value }))} />
+                    <input required className="input" value={reply.name} onChange={e => setReply(p => ({ ...p, name: e.target.value }))} />
                   </div>
                   <div>
                     <label className="label">{t('case_detail.reply_company')}</label>
-                    <input required className="input" value={reply.company}
-                      onChange={e => setReply(p => ({ ...p, company: e.target.value }))} />
+                    <input required className="input" value={reply.company} onChange={e => setReply(p => ({ ...p, company: e.target.value }))} />
                   </div>
                 </div>
                 <div>
                   <label className="label">{t('case_detail.reply_email')}</label>
-                  <input required type="email" className="input" value={reply.email}
-                    onChange={e => setReply(p => ({ ...p, email: e.target.value }))} />
+                  <input required type="email" className="input" value={reply.email} onChange={e => setReply(p => ({ ...p, email: e.target.value }))} />
                 </div>
                 <div>
                   <label className="label">{t('case_detail.reply_message')}</label>
-                  <textarea required rows={4} className="input resize-none" value={reply.message}
-                    onChange={e => setReply(p => ({ ...p, message: e.target.value }))} />
+                  <textarea required rows={4} className="input resize-none" value={reply.message} onChange={e => setReply(p => ({ ...p, message: e.target.value }))} />
                 </div>
                 <button type="submit" className="btn-primary">{t('case_detail.reply_submit')}</button>
               </form>
@@ -182,38 +287,43 @@ export default function CaseDetail() {
         {/* Sidebar */}
         <div className="space-y-4">
 
-          {/* Contacts / Authorities */}
-          {caso.contactos?.length > 0 && (
+          {/* PACTUM Pipeline */}
+          <div className="bg-white border border-ink-200 p-5">
+            <p className="section-label mb-4">{t('pactum.title')}</p>
+            <PactumPanel nivel={caso.pactum_nivel} status={caso.pactum_status} lang={lang} t={t} />
+          </div>
+
+          {/* Credential (if resolved) */}
+          {caso.credencial && (
+            <div className="border border-green-300 bg-green-50 p-5">
+              <p className="text-xs font-bold uppercase tracking-widest text-green-700 mb-2">
+                {t('modules.credentials')}
+              </p>
+              <p className="text-sm font-bold text-green-900">Cumplimiento Verificado — BRCcheck</p>
+              <p className="text-[10px] text-green-700 font-mono mt-1">#{caso.credencial.folio}</p>
+              <p className="text-[10px] text-green-600 mt-1">{fmt(caso.credencial.emitida)}</p>
+            </div>
+          )}
+
+          {/* Company link */}
+          {company && (
             <div className="bg-white border border-ink-200 p-5">
-              <p className="section-label mb-4">{t('case_detail.section_contacts')}</p>
-              <ul className="divide-y divide-ink-100">
-                {caso.contactos.map((c, i) => (
-                  <li key={i} className="py-3 first:pt-0 last:pb-0">
-                    <p className="text-sm font-semibold text-navy-900">{c.nombre}</p>
-                    <p className="text-xs text-ink-500 mt-0.5">{c.rol}</p>
-                    {c.email && (
-                      <a href={c.email.startsWith('http') ? c.email : `mailto:${c.email}`}
-                        target={c.email.startsWith('http') ? '_blank' : undefined}
-                        rel="noopener noreferrer"
-                        className="text-xs text-navy-600 hover:underline mt-1 block truncate">
-                        {c.email.startsWith('http') ? t('common.official_source') : c.email}
-                      </a>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <p className="section-label mb-3">{t('company.profile')}</p>
+              <Link to={`/empresa/${company.id}`}
+                className="flex items-center justify-between text-sm font-semibold text-navy-800 hover:text-teal-700 transition-colors">
+                {company.nombre}
+                <span className="text-xs font-black tabular-nums" style={{ color: '#C0392B' }}>
+                  RS {company.rs_score}
+                </span>
+              </Link>
             </div>
           )}
 
           {/* Download */}
           <div className="bg-navy-950 text-white p-5">
-            <p className="text-xs font-bold uppercase tracking-widest text-navy-400 mb-2">
-              {t('case_detail.report_full')}
-            </p>
-            <p className="text-sm text-navy-300 leading-relaxed mb-4">
-              {t('case_detail.report_desc')}
-            </p>
-            <Link to={`/cases/${caso.id}/report`}
+            <p className="text-xs font-bold uppercase tracking-widest text-navy-400 mb-2">{t('case_detail.report_full')}</p>
+            <p className="text-sm text-navy-300 leading-relaxed mb-4">{t('case_detail.report_desc')}</p>
+            <Link to={`/caso/${caso.id}/report`}
               className="btn-danger text-sm w-full flex items-center justify-center gap-2">
               <Download size={13} /> {t('case_detail.download_pdf')}
             </Link>

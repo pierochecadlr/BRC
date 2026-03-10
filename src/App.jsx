@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Suspense } from 'react'
 import { useTranslation } from 'react-i18next'
-// i18n is initialized in main.jsx — do NOT import here again
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
-import Cases from './pages/Cases'
+import Search from './pages/Search'
+import CompanyProfile from './pages/CompanyProfile'
 import CaseDetail from './pages/CaseDetail'
 import CaseReport from './pages/CaseReport'
 import SubmitCase from './pages/SubmitCase'
@@ -14,7 +14,7 @@ import AdminPanel from './pages/AdminPanel'
 function DemoBanner() {
   const { t } = useTranslation()
   return (
-    <div className="bg-navy-900 border-b border-navy-800 text-center text-[11px] font-medium py-1.5 px-4 text-navy-400">
+    <div className="bg-navy-950 border-b border-navy-800 text-center text-[11px] font-medium py-1.5 px-4 text-navy-400">
       {t('common.demo_notice')}
     </div>
   )
@@ -49,13 +49,14 @@ export default function App() {
         <main className="flex-1">
           <Suspense fallback={<Loading />}>
             <Routes>
-              <Route path="/"                 element={<Home />} />
-              <Route path="/cases"            element={<Cases />} />
-              <Route path="/cases/:id"        element={<CaseDetail />} />
-              <Route path="/cases/:id/report" element={<CaseReport />} />
-              <Route path="/submit"           element={<SubmitCase />} />
-              <Route path="/admin"            element={<AdminPanel />} />
-              <Route path="*"                 element={<NotFound />} />
+              <Route path="/"                    element={<Home />} />
+              <Route path="/buscar"              element={<Search />} />
+              <Route path="/empresa/:id"         element={<CompanyProfile />} />
+              <Route path="/caso/:id"            element={<CaseDetail />} />
+              <Route path="/caso/:id/report"     element={<CaseReport />} />
+              <Route path="/nuevo-caso"          element={<SubmitCase />} />
+              <Route path="/admin"               element={<AdminPanel />} />
+              <Route path="*"                    element={<NotFound />} />
             </Routes>
           </Suspense>
         </main>

@@ -1,8 +1,9 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CheckCircle, ArrowRight, ArrowLeft, Send, Upload, X as XIcon, FileText, Image, Film } from 'lucide-react'
+import { CheckCircle, ArrowRight, ArrowLeft, Send, Upload, X as XIcon, FileText, Image, Film, Loader, Sparkles } from 'lucide-react'
 import clsx from 'clsx'
+import { classifyEvidence } from '../lib/claude'
 
 const TOTAL_STEPS = 3
 
@@ -24,18 +25,55 @@ function fmtSize(bytes) {
 function FileUploadZone({ files, setFiles, t }) {
   const inputRef = useRef(null)
   const [dragging, setDragging] = useState(false)
+  const [aiResults, setAiResults] = useState({})
+  const [loadingIdx, setLoadingIdx] = useState(null)
 
-  function addFiles(list) {
+  async function addFiles(list) {
     const arr = Array.from(list)
-    setFiles(prev => [...prev, ...arr])
+    setFiles(prev => {
+      const startIdx = prev.length
+      // Trigger classification after state update via setTimeout
+      arr.forEach((file, offset) => {
+        const idx = startIdx + offset
+        setTimeout(async () => {
+          setLoadingIdx(idx)
+          const result = await classifyEvidence(file)
+          setAiResults(r => ({ ...r, [idx]: result }))
+          setLoadingIdx(null)
+        }, 0)
+      })
+      return [...prev, ...arr]
+    })
   }
+
   function remove(idx) {
     setFiles(prev => prev.filter((_, i) => i !== idx))
+    setAiResults(prev => {
+      const next = {}
+      Object.keys(prev).forEach(k => {
+        const ki = parseInt(k)
+        if (ki < idx) next[ki] = prev[k]
+        else if (ki > idx) next[ki - 1] = prev[k]
+      })
+      return next
+    })
   }
+
   function onDrop(e) {
     e.preventDefault()
     setDragging(false)
     addFiles(e.dataTransfer.files)
+  }
+
+  const nivelColor = {
+    'Insuficiente': '#C0392B',
+    'Básico': '#C8922A',
+    'Sólido': '#0D7377',
+    'Robusto': '#1A7A4A',
+    'Insufficient': '#C0392B',
+    'Basic': '#C8922A',
+    'Solid': '#0D7377',
+    'Robust': '#1A7A4A',
   }
 
   return (
@@ -70,18 +108,40 @@ function FileUploadZone({ files, setFiles, t }) {
       </div>
 
       {files.length > 0 && (
-        <ul className="mt-2 space-y-1">
+        <ul className="mt-2 space-y-2">
           {files.map((f, i) => (
-            <li key={i} className="flex items-center justify-between bg-ink-50 border border-ink-100 px-3 py-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-navy-600 flex-shrink-0">{fileIcon(f.name)}</span>
-                <span className="text-xs text-ink-700 truncate">{f.name}</span>
-                <span className="text-[10px] text-ink-400 flex-shrink-0 ml-1">{fmtSize(f.size)}</span>
+            <li key={i} className="bg-ink-50 border border-ink-100">
+              <div className="flex items-center justify-between px-3 py-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-navy-600 flex-shrink-0">{fileIcon(f.name)}</span>
+                  <span className="text-xs text-ink-700 truncate">{f.name}</span>
+                  <span className="text-[10px] text-ink-400 flex-shrink-0 ml-1">{fmtSize(f.size)}</span>
+                </div>
+                <button type="button" onClick={() => remove(i)}
+                  className="text-ink-400 hover:text-crimson-600 transition-colors ml-3 flex-shrink-0">
+                  <XIcon size={13} />
+                </button>
               </div>
-              <button type="button" onClick={() => remove(i)}
-                className="text-ink-400 hover:text-crimson-600 transition-colors ml-3 flex-shrink-0">
-                <XIcon size={13} />
-              </button>
+              {loadingIdx === i && (
+                <div className="px-3 pb-2 flex items-center gap-2 text-teal-600 text-xs">
+                  <Loader size={11} className="animate-spin" />
+                  <span>{t('ai.analyzing')}</span>
+                </div>
+              )}
+              {aiResults[i] && (
+                <div className="mx-3 mb-2 bg-teal-50 border border-teal-200 px-3 py-2">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Sparkles size={11} className="text-teal-600 flex-shrink-0" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-teal-700">{t('ai.classify_title')}</span>
+                    <span className="ml-auto text-[10px] font-black uppercase"
+                      style={{ color: nivelColor[aiResults[i].nivel] || '#0D7377' }}>
+                      {aiResults[i].nivel}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-teal-800 font-semibold">{aiResults[i].tipo}</p>
+                  <p className="text-[10px] text-teal-700 mt-0.5 leading-relaxed">{aiResults[i].observacion}</p>
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -179,7 +239,7 @@ export default function SubmitCase() {
         <CheckCircle size={40} className="text-emerald-500 mx-auto mb-4" />
         <h2 className="text-xl font-bold text-navy-950 mb-2">{t('submit.success_title')}</h2>
         <p className="text-sm text-ink-500 leading-relaxed mb-8">{t('submit.success_text')}</p>
-        <Link to="/cases" className="btn-primary inline-flex items-center gap-2">
+        <Link to="/buscar" className="btn-primary inline-flex items-center gap-2">
           <ArrowRight size={14} /> {t('submit.success_btn')}
         </Link>
       </div>
