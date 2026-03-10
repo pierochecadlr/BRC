@@ -10,6 +10,7 @@ import CaseDetail from './pages/CaseDetail'
 import CaseReport from './pages/CaseReport'
 import SubmitCase from './pages/SubmitCase'
 import AdminPanel from './pages/AdminPanel'
+import ChatBot from './components/ChatBot'
 
 function DemoBanner() {
   const { t } = useTranslation()
@@ -60,6 +61,7 @@ export default function App() {
             </Routes>
           </Suspense>
         </main>
+        <ChatBot />
         <Footer />
       </div>
     </BrowserRouter>

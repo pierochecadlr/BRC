@@ -35,6 +35,10 @@ export default function Home() {
               <div className="flex flex-wrap items-center gap-3">
                 <Link to="/buscar" className="btn-primary">{t('home.cta_search')}</Link>
                 <Link to="/nuevo-caso" className="btn-ghost-white">{t('home.cta_submit')}</Link>
+                <a href="mailto:info@brccheck.com?subject=Inversionistas%20BRCcheck"
+                  className="text-xs font-semibold text-navy-400 border border-navy-700 px-4 py-2 hover:border-teal-500 hover:text-teal-400 transition-colors">
+                  {t('home.cta_investors')}
+                </a>
               </div>
             </div>
 

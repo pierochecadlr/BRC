@@ -37,7 +37,8 @@
     "step2_desc": "The company is notified, given a reply period, and reviewed by a panel before any publication.",
     "step3_title": "Resolution or credential",
     "step3_desc": "If the conflict is resolved, the company receives a verifiable compliance credential.",
-    "how_it_works": "How BRCcheck works"
+    "how_it_works": "How BRCcheck works",
+    "cta_investors": "Investors"
   },
   "cases": {
     "title": "Browse Cases",
@@ -187,7 +188,8 @@
     "success_title": "Case Submitted!",
     "success_text": "Your case has been received. Our team will verify the sources before publishing.",
     "success_btn": "View All Cases",
-    "required": "This field is required"
+    "required": "This field is required",
+    "email_sent": "Notification sent to info@brccheck.com"
   },
   "admin": {
     "title": "Admin Panel",
@@ -259,5 +261,13 @@
     "verified": "Verified",
     "not_found": "Page not found",
     "go_home": "Go home"
+  },
+  "chatbot": {
+    "title": "BRCcheck Orientation",
+    "placeholder": "Does my case qualify? What evidence do I need?",
+    "send": "Send",
+    "thinking": "Analyzing...",
+    "open": "Have a case?",
+    "disclaimer": "General guidance only. Not a substitute for legal advice."
   }
 }

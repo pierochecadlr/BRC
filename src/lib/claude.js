@@ -81,3 +81,40 @@ export async function generateCaseSummary(rawFacts, lang = 'es') {
     return MOCK_SUMMARY
   }
 }
+
+// ─── Orientation Chatbot ──────────────────────────────────────────────────────
+
+const MOCK_CHAT = {
+  es: [
+    'Tu caso puede calificar para BRCcheck si tienes documentación del conflicto: contratos, facturas, notificaciones o correos formales.',
+    'Para registrar un caso necesitas: nombre de la empresa, descripción del conflicto, monto estimado del impacto y al menos un documento de soporte.',
+    'BRCcheck garantiza debido proceso: la empresa es notificada antes de cualquier publicación y tiene derecho de réplica.',
+    'El proceso PACTUM busca resolver el conflicto antes de llegar a litigio: L1 Negociación → L2 Mediación → L3 Arbitraje → L4 Litigio.',
+  ],
+  en: [
+    'Your case may qualify for BRCcheck if you have documentation of the conflict: contracts, invoices, formal notifications or emails.',
+    'To register a case you need: company name, conflict description, estimated impact amount, and at least one supporting document.',
+    'BRCcheck guarantees due process: the company is notified before any publication and has the right of reply.',
+    'The PACTUM process seeks resolution before litigation: L1 Negotiation → L2 Mediation → L3 Arbitration → L4 Litigation.',
+  ],
+}
+
+export async function askOrientationBot(question, lang = 'es') {
+  if (!API_KEY) {
+    const arr = MOCK_CHAT[lang] || MOCK_CHAT.es
+    return arr[Math.floor(Math.random() * arr.length)]
+  }
+
+  const systemCtx = lang === 'en'
+    ? 'You are the BRCcheck orientation assistant. BRCcheck is an institutional platform that documents commercial disputes with structured evidence and due process. Answer in English, in 2-3 sentences max. Do not give legal advice.'
+    : 'Eres el asistente de orientación de BRCcheck. BRCcheck es una plataforma institucional que documenta conflictos comerciales con evidencia estructurada y debido proceso garantizado. Responde en español, máximo 2-3 oraciones. No des asesoría legal.'
+
+  const prompt = `${systemCtx}\n\nPregunta del usuario: ${question}`
+
+  try {
+    const text = await callClaude(prompt, 200)
+    return text || MOCK_CHAT[lang]?.[0] || MOCK_CHAT.es[0]
+  } catch {
+    return MOCK_CHAT[lang]?.[0] || MOCK_CHAT.es[0]
+  }
+}

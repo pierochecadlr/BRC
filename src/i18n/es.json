@@ -37,7 +37,8 @@
     "step2_desc": "La empresa es notificada, tiene plazo de réplica y panel de revisión antes de cualquier publicación.",
     "step3_title": "Resolución o credencial",
     "step3_desc": "Si el conflicto se resuelve, la empresa recibe una credencial de cumplimiento verificable.",
-    "how_it_works": "Cómo funciona BRCcheck"
+    "how_it_works": "Cómo funciona BRCcheck",
+    "cta_investors": "Inversionistas"
   },
   "cases": {
     "title": "Buscar Casos",
@@ -187,7 +188,8 @@
     "success_title": "¡Caso Enviado!",
     "success_text": "Tu caso ha sido recibido. Nuestro equipo lo revisará y verificará las fuentes antes de publicarlo.",
     "success_btn": "Ver Todos los Casos",
-    "required": "Este campo es requerido"
+    "required": "Este campo es requerido",
+    "email_sent": "Notificación enviada a info@brccheck.com"
   },
   "admin": {
     "title": "Panel de Administración",
@@ -259,5 +261,13 @@
     "verified": "Verificado",
     "not_found": "Página no encontrada",
     "go_home": "Ir al inicio"
+  },
+  "chatbot": {
+    "title": "Orientación BRCcheck",
+    "placeholder": "¿Califica mi caso? ¿Qué evidencia necesito?",
+    "send": "Enviar",
+    "thinking": "Analizando...",
+    "open": "¿Tienes un caso?",
+    "disclaimer": "Orientación general. No sustituye asesoría legal."
   }
 }

@@ -111,19 +111,19 @@ export const MOCK_CASES = [
       {
         tipo: 'CONTRATO',
         titulo: { es: 'Contrato de obra BRC-001-A (firmado por ambas partes)', en: 'Construction contract BRC-001-A (signed by both parties)' },
-        url: '#', fuente: 'Denunciante',
+        url: '#', fuente: 'Denunciante', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: false, score: 67 },
       },
       {
         tipo: 'NOTIF',
         titulo: { es: 'Notificación formal — 1er aviso (correo certificado)', en: 'Formal notification — 1st notice (certified mail)' },
-        url: '#', fuente: 'Denunciante',
+        url: '#', fuente: 'Denunciante', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: true, score: 100 },
       },
       {
         tipo: 'FOTO',
         titulo: { es: 'Registro fotográfico de materiales defectuosos', en: 'Photographic record of defective materials' },
-        url: '#', fuente: 'Denunciante',
+        url: '#', fuente: 'Denunciante', status: 'pendiente',
         quality: { tiene_fecha: true, firmado: false, validacion_cruzada: false, score: 33 },
       },
     ],
@@ -161,13 +161,13 @@ export const MOCK_CASES = [
       {
         tipo: 'FACTURA',
         titulo: { es: 'Facturas 001, 002, 003 — servicios de consultoría (sin pagar)', en: 'Invoices 001, 002, 003 — consulting services (unpaid)' },
-        url: '#', fuente: 'Consultoría Veritas',
+        url: '#', fuente: 'Consultoría Veritas', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: true, score: 100 },
       },
       {
         tipo: 'CONTRATO',
         titulo: { es: 'Contrato de prestación de servicios firmado', en: 'Signed services agreement' },
-        url: '#', fuente: 'Consultoría Veritas',
+        url: '#', fuente: 'Consultoría Veritas', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: false, score: 67 },
       },
     ],
@@ -209,7 +209,7 @@ export const MOCK_CASES = [
       {
         tipo: 'ACUERDO',
         titulo: { es: 'Acuerdo de resolución firmado por ambas partes', en: 'Resolution agreement signed by both parties' },
-        url: '#', fuente: 'BRCcheck',
+        url: '#', fuente: 'BRCcheck', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: true, score: 100 },
       },
     ],

@@ -216,12 +216,22 @@ export default function CaseDetail() {
               <div className="space-y-3">
                 {caso.evidencia.map((ev, i) => (
                   <div key={i} className="bg-white border border-ink-100 px-4 py-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
                       <span className="text-[10px] font-black uppercase px-1.5 py-0.5 bg-navy-100 text-navy-700 flex-shrink-0">
                         {ev.tipo}
                       </span>
                       <p className="text-sm text-ink-700 flex-1">{lf(ev.titulo, lang)}</p>
                       <span className="text-[10px] text-ink-400 font-semibold flex-shrink-0">{ev.fuente}</span>
+                      {ev.status && (
+                        <span className={[
+                          'text-[9px] font-black uppercase px-1.5 py-0.5 flex-shrink-0',
+                          ev.status === 'verificado' ? 'bg-green-100 text-green-700 border border-green-200' :
+                          ev.status === 'pendiente'  ? 'bg-amber-100 text-amber-700 border border-amber-200' :
+                                                       'bg-crimson-100 text-crimson-700 border border-crimson-200'
+                        ].join(' ')}>
+                          {ev.status === 'verificado' ? '✓ ' : ev.status === 'pendiente' ? '⏳ ' : '✗ '}{ev.status}
+                        </span>
+                      )}
                     </div>
                     {ev.quality && <EvidenceQuality ev={ev} lang={lang} t={t} />}
                   </div>

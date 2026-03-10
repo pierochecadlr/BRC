@@ -191,6 +191,7 @@ export default function SubmitCase() {
   const { t } = useTranslation()
   const [step, setStep] = useState(1)
   const [done, setDone] = useState(false)
+  const [toast, setToast] = useState(false)
   const [errors, setErrors] = useState({})
   const [files, setFiles] = useState([])
   const [form, setForm] = useState({
@@ -234,6 +235,12 @@ export default function SubmitCase() {
   ]
 
   if (done) return (
+    <>
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-navy-950 text-white text-xs font-semibold px-5 py-3 flex items-center gap-2 shadow-xl">
+          <span className="text-teal-400">✓</span> {t('submit.email_sent')}
+        </div>
+      )}
     <div className="max-w-md mx-auto px-5 py-20 text-center">
       <div className="bg-white border border-ink-200 p-10">
         <CheckCircle size={40} className="text-emerald-500 mx-auto mb-4" />
@@ -244,6 +251,7 @@ export default function SubmitCase() {
         </Link>
       </div>
     </div>
+  </>
   )
 
   return (
@@ -382,7 +390,7 @@ export default function SubmitCase() {
               {t('submit.btn_next')} <ArrowRight size={14} />
             </button>
           ) : (
-            <button onClick={() => setDone(true)} className="btn-danger flex items-center gap-2 text-sm">
+            <button onClick={() => { setDone(true); setToast(true); setTimeout(() => setToast(false), 5000) }} className="btn-danger flex items-center gap-2 text-sm">
               <Send size={14} /> {t('submit.btn_submit')}
             </button>
           )}

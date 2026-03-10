@@ -1,6 +1,9 @@
+import { useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Award, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Award, CheckCircle, Download } from 'lucide-react'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 import ReputationScore from '../components/ReputationScore'
 import RsBadge from '../components/RsBadge'
 import { MOCK_COMPANIES, MOCK_CASES, rsColor, lf } from '../lib/mockData'
@@ -44,6 +47,18 @@ export default function CompanyProfile() {
       </Link>
     </div>
   )
+
+  const credRef = useRef(null)
+
+  async function downloadCredential(caso) {
+    const el = credRef.current
+    if (!el) return
+    const canvas = await html2canvas(el, { scale: 3, useCORS: true })
+    const imgData = canvas.toDataURL('image/png')
+    const pdf = new jsPDF('l', 'mm', [120, 80])
+    pdf.addImage(imgData, 'PNG', 0, 0, 120, 80)
+    pdf.save('BRCcheck-Credencial-' + (caso?.credencial?.folio || 'CRED') + '.pdf')
+  }
 
   const activeCases   = cases.filter(c => c.status !== 'resuelto')
   const resolvedCases = cases.filter(c => c.status === 'resuelto')
@@ -107,12 +122,44 @@ export default function CompanyProfile() {
 
           {/* Credential badge if any */}
           {company.credenciales > 0 && (
-            <div className="border border-green-200 bg-green-50 p-4 flex items-start gap-3">
-              <Award size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-green-700">{t('company.credential_title')}</p>
-                <p className="text-xs text-green-700 mt-0.5">{t('company.credential_desc', { n: company.credenciales })}</p>
+            <div className="border border-green-200 bg-green-50 p-4">
+              <div className="flex items-start gap-3 mb-3">
+                <Award size={18} className="text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-xs font-bold uppercase tracking-widest text-green-700">{t('company.credential_title')}</p>
+                  <p className="text-xs text-green-700 mt-0.5">{t('company.credential_desc', { n: company.credenciales })}</p>
+                </div>
               </div>
+              {/* Hidden printable credential card */}
+              <div ref={credRef} style={{
+                background: 'linear-gradient(135deg, #1B3557 0%, #0D111C 100%)',
+                padding: '20px 24px', width: '360px', position: 'absolute', left: '-9999px', top: 0,
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+                  <div>
+                    <p style={{ color: '#fff', fontWeight: 900, fontSize: 18, letterSpacing: -0.5 }}>BRC<span style={{ color: '#0D7377' }}>check</span></p>
+                    <p style={{ color: '#0D7377', fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2 }}>Buró Reputacional Ciudadano</p>
+                  </div>
+                  <div style={{ background: '#1A7A4A', padding: '3px 8px' }}>
+                    <p style={{ color: '#fff', fontSize: 8, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1 }}>✓ Verificado</p>
+                  </div>
+                </div>
+                <p style={{ color: '#C8922A', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 2, marginBottom: 4 }}>Cumplimiento Verificado</p>
+                <p style={{ color: '#fff', fontSize: 15, fontWeight: 800, marginBottom: 12 }}>{company.nombre}</p>
+                {resolvedCases.filter(rc => rc.credencial).slice(0, 1).map(rc => (
+                  <div key={rc.id}>
+                    <p style={{ color: '#8899aa', fontSize: 9, fontWeight: 600, fontFamily: 'monospace' }}>Folio: {rc.credencial.folio}</p>
+                    <p style={{ color: '#8899aa', fontSize: 9, marginTop: 2 }}>Emitida: {new Date(rc.credencial.emitida).toLocaleDateString('es-MX')}</p>
+                  </div>
+                ))}
+                <p style={{ color: '#445566', fontSize: 8, marginTop: 12, borderTop: '1px solid #223344', paddingTop: 8 }}>brccheck.com · info@brccheck.com</p>
+              </div>
+              <button
+                onClick={() => downloadCredential(resolvedCases.find(rc => rc.credencial))}
+                className="flex items-center gap-1.5 text-xs font-semibold text-green-700 border border-green-300 px-3 py-1.5 hover:bg-green-100 transition-colors"
+              >
+                <Download size={11} /> Descargar credencial PDF
+              </button>
             </div>
           )}
 

@@ -23,7 +23,7 @@ export default {
         navy: {
           50:  '#eef1f8',
           100: '#d5ddef',
-          200: '#abbbd f',
+          200: '#abbbdf',
           300: '#7a96cc',
           400: '#4f74b8',
           500: '#3358a0',
@@ -31,7 +31,7 @@ export default {
           700: '#1B3557',
           800: '#142844',
           900: '#0d1b2e',
-          950: '#080f1c',
+          950: '#0D111C',
         },
         teal: {
           50:  '#e8f7f7',
@@ -72,6 +72,9 @@ export default {
         },
         brc: {
           green: '#1A7A4A',
+          dark:  '#0D111C',
+          lgray: '#F4F6F9',
+          text:  '#2C3E50',
         },
       },
       fontFamily: {
