@@ -5,7 +5,9 @@
     "submit": "Submit a Case",
     "admin": "Admin",
     "report": "Report",
-    "tagline": "Citizens' Reputational Bureau"
+    "tagline": "Citizens' Reputational Bureau",
+    "como_funciona": "How It Works",
+    "membresia": "Membership"
   },
   "home": {
     "hero_title": "Citizen Transparency",
@@ -38,7 +40,13 @@
     "step3_title": "Resolution or credential",
     "step3_desc": "If the conflict is resolved, the company receives a verifiable compliance credential.",
     "how_it_works": "How BRCcheck works",
-    "cta_investors": "Investors"
+    "cta_investors": "Investors",
+    "donation_badge": "Support the mission",
+    "donation_title": "Support BRCcheck with an Ethical Contribution",
+    "donation_desc": "Your contribution keeps BRCcheck transparent, independent, and community-focused.",
+    "donate_10": "Donate $10",
+    "donate_25": "Donate $25",
+    "view_memberships": "View memberships"
   },
   "cases": {
     "title": "Browse Cases",
@@ -239,12 +247,152 @@
   },
   "footer": {
     "tagline": "Citizen transparency with verified sources.",
+    "brand_desc": "Evidence, due process, and economic compliance infrastructure.",
     "links": "Quick Links",
+    "platform": "Platform",
+    "how_it_works": "How It Works",
+    "search": "Browse Companies",
+    "register": "Register a Case",
+    "membership": "Membership",
     "contact": "Contact",
     "legal": "Legal",
-    "privacy": "Privacy Policy",
+    "legal_notice": "Legal Notice",
+    "privacy": "Privacy",
+    "privacy_policy": "Privacy Policy",
     "terms": "Terms of Use",
+    "cookies": "Cookie Policy",
+    "ethics": "Ethics & Standards",
+    "operated_by": "Operated by MC&D LLC · Texas, USA",
+    "disclaimer": "BRCcheck is not a court and does not replace legal advice.",
     "rights": "All rights reserved."
+  },
+  "como_funciona": {
+    "hero_badge": "Platform",
+    "hero_title": "How",
+    "hero_title_highlight": "BRCcheck Works",
+    "hero_subtitle": "Institutional infrastructure for evidence, due process, and compliance.",
+    "cta_search": "Browse Companies",
+    "cta_register": "Register a Case",
+    "what_is": "What is BRCcheck?",
+    "what_not_badge": "What it is NOT",
+    "what_yes_badge": "What it DOES",
+    "not_items": [
+      "Does not impose sanctions",
+      "Does not replace the judicial system",
+      "Does not determine guilt",
+      "Is not an anonymous complaints platform"
+    ],
+    "yes_items": [
+      "Structures evidence to evidentiary standards",
+      "Guarantees notification and right of reply",
+      "Generates legitimate, fact-based pressure",
+      "Incentivizes resolution before litigation",
+      "Turns reputation into a verifiable asset"
+    ],
+    "arch_badge": "Architecture",
+    "modules_title": "BRCcheck's 5 Modules",
+    "process_title": "The Process Step by Step",
+    "positioning_title": "Positioning",
+    "positioning_sub": "BRCcheck can be presented as:",
+    "cta_badge": "Get Started",
+    "cta_title": "Have a Case?",
+    "cta_desc": "Register your case with structured evidence and guaranteed due process.",
+    "cta_btn": "Register Case",
+    "modules": [
+      {
+        "title": "Evidence Vault",
+        "subtitle": "Evidentiary Repository",
+        "desc": "Structured document storage with date, signature, and source validation. Each file receives a cryptographic hash to guarantee its integrity."
+      },
+      {
+        "title": "Proof-of-Integrity Layer",
+        "subtitle": "Verification Layer",
+        "desc": "AI-powered classification system (Claude) that evaluates evidentiary quality and assigns a sufficiency level: Insufficient, Basic, Solid, or Robust."
+      },
+      {
+        "title": "Due Process Engine",
+        "subtitle": "Due Process Engine",
+        "desc": "Ensures every company is formally notified before any publication. 15-day period to exercise the right of reply."
+      },
+      {
+        "title": "Resolution Pipeline",
+        "subtitle": "PACTUM (L1 → L4)",
+        "desc": "Structured invitation to resolve: L1 Negotiation → L2 Mediation → L3 Arbitration → L4 Litigation. Reduces costs and time vs. the court system."
+      },
+      {
+        "title": "Credential & Trust Layer",
+        "subtitle": "Verifiable Credentials",
+        "desc": "If the company resolves the conflict, it receives a verifiable digital credential that converts compliance into a public reputational asset."
+      }
+    ],
+    "steps": [
+      { "title": "Case Registration", "desc": "Complainant uploads facts and evidence with verifiable documents." },
+      { "title": "AI Classification", "desc": "Claude analyzes and rates the evidence automatically." },
+      { "title": "Notification", "desc": "Company receives formal notice with a 15-day window to respond." },
+      { "title": "Right of Reply", "desc": "Company can respond and submit its own evidence." },
+      { "title": "Panel Review", "desc": "BRCcheck team evaluates both sides objectively." },
+      { "title": "Publication", "desc": "Case published with full documentary traceability." },
+      { "title": "PACTUM", "desc": "Structured invitation to resolve the conflict before litigation." },
+      { "title": "Credential", "desc": "If resolved, a verifiable compliance credential is issued." }
+    ],
+    "posiciones": [
+      "Social probatory audit system",
+      "Private evidence and compliance infrastructure",
+      "Verifiable reputational traceability layer",
+      "Litigation reduction mechanism",
+      "Compliance tool for SMEs"
+    ]
+  },
+  "membresia": {
+    "hero_badge": "Membership",
+    "hero_title": "Join",
+    "hero_title_highlight": "BRCcheck",
+    "hero_subtitle": "Choose the level that best fits your role.",
+    "donation_badge": "Ethical Contribution",
+    "donation_title": "Support BRCcheck with an Ethical Contribution",
+    "donation_desc": "Your contribution keeps BRCcheck transparent, independent, and community-focused. Every contribution helps cover operational costs and platform development.",
+    "donate_10": "Donate $10",
+    "donate_25": "Donate $25",
+    "stripe_note": "Secure payments via Stripe",
+    "tiers": [
+      {
+        "name": "Verified Citizen",
+        "price": "Free",
+        "priceNote": "",
+        "desc": "Basic platform access. Browse public cases and register your own.",
+        "features": ["Company search", "Case file lookup", "1 active case", "Orientation chatbot"],
+        "cta": "Register free"
+      },
+      {
+        "name": "Founding Collaborator",
+        "price": "$49",
+        "priceNote": "USD/mo",
+        "desc": "Support BRCcheck's operations and access advanced features.",
+        "features": ["Everything in previous plan", "Unlimited cases", "Downloadable PDF reports", "Priority review", "\"Founder\" badge"],
+        "cta": "Subscribe"
+      },
+      {
+        "name": "Legal Ally",
+        "price": "$199",
+        "priceNote": "USD/mo",
+        "desc": "For lawyers, firms, and consultants who use BRCcheck as a compliance tool.",
+        "features": ["Everything in previous plan", "Query API", "Verifiable credentials", "Client dashboard", "Priority support", "\"Legal Ally\" badge"],
+        "cta": "Contact Us"
+      },
+      {
+        "name": "Institution / Company",
+        "price": "Custom",
+        "priceNote": "",
+        "desc": "For institutions, media, organizations, and companies that want to integrate BRCcheck into their due diligence processes.",
+        "features": ["Everything in previous plan", "Custom API integration", "White-label available", "Guaranteed SLA", "Dedicated account"],
+        "cta": "Talk to the team"
+      }
+    ]
+  },
+  "legal_pages": {
+    "back": "← Back to home",
+    "updated": "Effective",
+    "rights": "© 2024–2026 BRCcheck · MC&D LLC · All rights reserved."
   },
   "risk": {
     "alto": "High",

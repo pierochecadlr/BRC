@@ -139,19 +139,19 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 py-14">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div>
-              <p className="text-teal-400 text-xs font-bold uppercase tracking-widest mb-2">Apoya la misión</p>
-              <h2 className="text-2xl font-black mb-2">Apoya BRCcheck con una Contribución Ética</h2>
+              <p className="text-teal-400 text-xs font-bold uppercase tracking-widest mb-2">{t('home.donation_badge')}</p>
+              <h2 className="text-2xl font-black mb-2">{t('home.donation_title')}</h2>
               <p className="text-navy-300 text-sm leading-relaxed max-w-lg">
-                Tu aportación mantiene BRCcheck transparente, independiente y orientado a la comunidad.
+                {t('home.donation_desc')}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
               <a href="https://buy.stripe.com/placeholder_donation_10"
-                className="btn-primary text-center">Donar $10</a>
+                className="btn-primary text-center">{t('home.donate_10')}</a>
               <a href="https://buy.stripe.com/placeholder_donation_25"
-                className="bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 text-sm transition-colors text-center">Donar $25</a>
+                className="bg-teal-600 hover:bg-teal-700 text-white font-bold px-5 py-2.5 text-sm transition-colors text-center">{t('home.donate_25')}</a>
               <Link to="/membresia"
-                className="btn-ghost-white text-center">Ver membresías</Link>
+                className="btn-ghost-white text-center">{t('home.view_memberships')}</Link>
             </div>
           </div>
         </div>

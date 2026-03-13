@@ -13,10 +13,10 @@ export default function Navbar() {
 
   const links = [
     { to: '/',               label: t('nav.home') },
-    { to: '/como-funciona',  label: 'Cómo Funciona' },
+    { to: '/como-funciona',  label: t('nav.como_funciona') },
     { to: '/buscar',         label: t('nav.cases') },
     { to: '/nuevo-caso',     label: t('nav.submit') },
-    { to: '/membresia',      label: 'Membresía' },
+    { to: '/membresia',      label: t('nav.membresia') },
   ]
 
   const isActive = (to) => to === '/' ? pathname === '/' : pathname.startsWith(to)
