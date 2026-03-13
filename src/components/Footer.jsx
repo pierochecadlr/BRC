@@ -1,51 +1,115 @@
 import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 
 export default function Footer() {
-  const { t } = useTranslation()
-
   return (
     <footer className="bg-navy-950 mt-24">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 py-12">
-        <div className="flex flex-col sm:flex-row items-start justify-between gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
-          {/* Brand */}
+          {/* Column 1 — Brand */}
           <div>
-            <p className="text-white font-black text-lg tracking-tight">
-              BRC<span className="text-crimson-500">.</span>
+            <p className="text-white font-black text-lg tracking-tight mb-1">
+              BRC<span className="text-teal-400">check</span>
             </p>
-            <p className="text-navy-500 text-xs mt-1">Buró Reputacional Ciudadano</p>
-            <p className="text-navy-400 text-xs mt-3 max-w-xs leading-relaxed">
-              {t('footer.tagline')}
+            <p className="text-navy-500 text-xs mb-3">Buró Reputacional Ciudadano</p>
+            <p className="text-navy-400 text-xs leading-relaxed mb-3 max-w-xs">
+              Infraestructura de evidencia, debido proceso y cumplimiento económico.
             </p>
             <a href="mailto:info@brccheck.com"
-               className="text-navy-500 hover:text-navy-300 text-xs mt-3 block transition-colors">
+              className="text-navy-500 hover:text-teal-400 text-xs transition-colors">
               info@brccheck.com
             </a>
           </div>
 
-          {/* Nav */}
-          <div className="flex gap-12 text-sm">
-            <div>
-              <p className="section-label text-navy-600 mb-3">{t('footer.links')}</p>
-              <ul className="space-y-2">
-                <li><Link to="/" className="text-navy-400 hover:text-white text-xs transition-colors">{t('nav.home')}</Link></li>
-                <li><Link to="/cases" className="text-navy-400 hover:text-white text-xs transition-colors">{t('nav.cases')}</Link></li>
-                <li><Link to="/submit" className="text-navy-400 hover:text-white text-xs transition-colors">{t('nav.submit')}</Link></li>
-              </ul>
-            </div>
-            <div>
-              <p className="section-label text-navy-600 mb-3">{t('footer.legal')}</p>
-              <ul className="space-y-2">
-                <li><a href="#" className="text-navy-400 hover:text-white text-xs transition-colors">{t('footer.privacy')}</a></li>
-                <li><a href="#" className="text-navy-400 hover:text-white text-xs transition-colors">{t('footer.terms')}</a></li>
-              </ul>
-            </div>
+          {/* Column 2 — Plataforma */}
+          <div>
+            <p className="section-label text-navy-600 mb-4">Plataforma</p>
+            <ul className="space-y-2.5">
+              <li>
+                <Link to="/como-funciona" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Cómo Funciona
+                </Link>
+              </li>
+              <li>
+                <Link to="/buscar" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Buscar Empresas
+                </Link>
+              </li>
+              <li>
+                <Link to="/nuevo-caso" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Registrar Caso
+                </Link>
+              </li>
+              <li>
+                <Link to="/membresia" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Membresía
+                </Link>
+              </li>
+            </ul>
           </div>
+
+          {/* Column 3 — Legal */}
+          <div>
+            <p className="section-label text-navy-600 mb-4">Legal</p>
+            <ul className="space-y-2.5">
+              <li>
+                <Link to="/aviso-legal" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Aviso Legal
+                </Link>
+              </li>
+              <li>
+                <Link to="/terminos" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Términos de Uso
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacidad" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Privacidad
+                </Link>
+              </li>
+              <li>
+                <Link to="/cookies" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Política de Cookies
+                </Link>
+              </li>
+              <li>
+                <Link to="/etica-legal" className="text-navy-400 hover:text-white text-xs transition-colors">
+                  Ética y Estándares
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Column 4 — Contacto */}
+          <div>
+            <p className="section-label text-navy-600 mb-4">Contacto</p>
+            <ul className="space-y-2.5">
+              <li>
+                <a href="mailto:info@brccheck.com"
+                  className="text-navy-400 hover:text-white text-xs transition-colors">
+                  info@brccheck.com
+                </a>
+              </li>
+              <li>
+                <a href="https://brccheck.com" target="_blank" rel="noopener noreferrer"
+                  className="text-navy-400 hover:text-white text-xs transition-colors">
+                  brccheck.com
+                </a>
+              </li>
+              <li>
+                <p className="text-navy-600 text-xs">Operado por MC&amp;D LLC · Texas, EUA</p>
+              </li>
+            </ul>
+          </div>
+
         </div>
 
-        <div className="mt-10 pt-6 border-t border-navy-900 flex items-center justify-between">
-          <p className="text-navy-700 text-xs">© {new Date().getFullYear()} BRCcheck. {t('footer.rights')}</p>
+        {/* Bottom bar */}
+        <div className="mt-10 pt-6 border-t border-navy-900">
+          <p className="text-navy-700 text-xs leading-relaxed">
+            © 2024–2026 BRCcheck · MC&amp;D LLC · Todos los derechos reservados ·{' '}
+            BRCcheck no es un tribunal ni sustituye asesoría legal.
+          </p>
         </div>
       </div>
     </footer>

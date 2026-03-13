@@ -12,9 +12,11 @@ export default function Navbar() {
   const lang = i18n.language?.startsWith('es') ? 'es' : 'en'
 
   const links = [
-    { to: '/',           label: t('nav.home') },
-    { to: '/buscar',     label: t('nav.cases') },
-    { to: '/nuevo-caso', label: t('nav.submit') },
+    { to: '/',               label: t('nav.home') },
+    { to: '/como-funciona',  label: 'Cómo Funciona' },
+    { to: '/buscar',         label: t('nav.cases') },
+    { to: '/nuevo-caso',     label: t('nav.submit') },
+    { to: '/membresia',      label: 'Membresía' },
   ]
 
   const isActive = (to) => to === '/' ? pathname === '/' : pathname.startsWith(to)

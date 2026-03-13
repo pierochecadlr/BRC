@@ -11,6 +11,13 @@ import CaseReport from './pages/CaseReport'
 import SubmitCase from './pages/SubmitCase'
 import AdminPanel from './pages/AdminPanel'
 import ChatBot from './components/ChatBot'
+import ComoFunciona from './pages/ComoFunciona'
+import Membresia from './pages/Membresia'
+import Privacidad from './pages/legal/Privacidad'
+import Terminos from './pages/legal/Terminos'
+import Cookies from './pages/legal/Cookies'
+import EticaLegal from './pages/legal/EticaLegal'
+import AvisoLegal from './pages/legal/AvisoLegal'
 
 function DemoBanner() {
   const { t } = useTranslation()
@@ -57,6 +64,13 @@ export default function App() {
               <Route path="/caso/:id/report"     element={<CaseReport />} />
               <Route path="/nuevo-caso"          element={<SubmitCase />} />
               <Route path="/admin"               element={<AdminPanel />} />
+              <Route path="/como-funciona"       element={<ComoFunciona />} />
+              <Route path="/membresia"           element={<Membresia />} />
+              <Route path="/privacidad"          element={<Privacidad />} />
+              <Route path="/terminos"            element={<Terminos />} />
+              <Route path="/cookies"             element={<Cookies />} />
+              <Route path="/etica-legal"         element={<EticaLegal />} />
+              <Route path="/aviso-legal"         element={<AvisoLegal />} />
               <Route path="*"                    element={<NotFound />} />
             </Routes>
           </Suspense>
