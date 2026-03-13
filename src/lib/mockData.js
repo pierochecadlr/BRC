@@ -79,6 +79,10 @@ export const MOCK_COMPANIES = [
   },
 ]
 
+function makeHash(str) {
+  return 'sha256-' + str.slice(0, 16).toLowerCase().replace(/[^a-z0-9]/g, 'x').padEnd(16, '0')
+}
+
 export const MOCK_CASES = [
   {
     id: 'BRC-001',
@@ -113,22 +117,36 @@ export const MOCK_CASES = [
         titulo: { es: 'Contrato de obra BRC-001-A (firmado por ambas partes)', en: 'Construction contract BRC-001-A (signed by both parties)' },
         url: '#', fuente: 'Denunciante', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: false, score: 67 },
+        version: 'v1',
+        hash: makeHash('Contrato de obra BRC-001-A (firmado por ambas partes)'),
+        uploaded_at: '2023-10-01T09:15:00Z',
       },
       {
         tipo: 'NOTIF',
         titulo: { es: 'Notificación formal — 1er aviso (correo certificado)', en: 'Formal notification — 1st notice (certified mail)' },
         url: '#', fuente: 'Denunciante', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: true, score: 100 },
+        version: 'v1',
+        hash: makeHash('Notificación formal — 1er aviso (correo certificado)'),
+        uploaded_at: '2023-10-01T10:30:00Z',
       },
       {
         tipo: 'FOTO',
         titulo: { es: 'Registro fotográfico de materiales defectuosos', en: 'Photographic record of defective materials' },
         url: '#', fuente: 'Denunciante', status: 'pendiente',
         quality: { tiene_fecha: true, firmado: false, validacion_cruzada: false, score: 33 },
+        version: 'v1',
+        hash: makeHash('Registro fotográfico de materiales defectuosos'),
+        uploaded_at: '2023-10-01T11:45:00Z',
       },
     ],
     status: 'en_proceso',
     created_at: '2023-10-01T00:00:00Z',
+    bitacora: [
+      { id: 1, fecha: '2023-10-01T09:00:00Z', tipo: 'notificacion', actor: 'BRCcheck Sistema', descripcion: { es: 'Caso registrado. Notificación formal enviada a Constructora Nexo S.A. de C.V.', en: 'Case registered. Formal notification sent to Constructora Nexo S.A. de C.V.' }, nota: null },
+      { id: 2, fecha: '2023-10-05T14:30:00Z', tipo: 'evidencia_agregada', actor: 'Denunciante', descripcion: { es: 'Contrato de obra y notificación formal agregados al expediente.', en: 'Construction contract and formal notification added to file.' }, nota: null },
+      { id: 3, fecha: '2023-10-15T10:00:00Z', tipo: 'plazo_vencido', actor: 'BRCcheck Sistema', descripcion: { es: 'Plazo de réplica vencido sin respuesta de la empresa.', en: 'Reply period expired without response from company.' }, nota: null },
+    ],
   },
   {
     id: 'BRC-002',
@@ -163,16 +181,28 @@ export const MOCK_CASES = [
         titulo: { es: 'Facturas 001, 002, 003 — servicios de consultoría (sin pagar)', en: 'Invoices 001, 002, 003 — consulting services (unpaid)' },
         url: '#', fuente: 'Consultoría Veritas', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: true, score: 100 },
+        version: 'v1',
+        hash: makeHash('Facturas 001, 002, 003 — servicios de consultoría (sin pagar)'),
+        uploaded_at: '2023-07-15T08:00:00Z',
       },
       {
         tipo: 'CONTRATO',
         titulo: { es: 'Contrato de prestación de servicios firmado', en: 'Signed services agreement' },
         url: '#', fuente: 'Consultoría Veritas', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: false, score: 67 },
+        version: 'v1',
+        hash: makeHash('Contrato de prestación de servicios firmado'),
+        uploaded_at: '2023-07-15T08:30:00Z',
       },
     ],
     status: 'en_resolucion',
     created_at: '2023-07-15T00:00:00Z',
+    bitacora: [
+      { id: 1, fecha: '2023-07-15T08:00:00Z', tipo: 'notificacion', actor: 'BRCcheck Sistema', descripcion: { es: 'Caso BRC-002 registrado. Notificación enviada a Constructora Nexo S.A. de C.V.', en: 'Case BRC-002 registered. Notification sent to Constructora Nexo S.A. de C.V.' }, nota: null },
+      { id: 2, fecha: '2023-07-20T11:00:00Z', tipo: 'evidencia_agregada', actor: 'Consultoría Veritas', descripcion: { es: 'Facturas y contrato de servicios agregados al expediente.', en: 'Invoices and service contract added to file.' }, nota: null },
+      { id: 3, fecha: '2023-08-10T09:00:00Z', tipo: 'pactum_avanzado', actor: 'BRCcheck Sistema', descripcion: { es: 'PACTUM avanzado de L1 (Negociación) a L2 (Mediación). Sin respuesta de la empresa en etapa inicial.', en: 'PACTUM advanced from L1 (Negotiation) to L2 (Mediation). No company response in initial stage.' }, nota: 'Empresa notificada sin respuesta en 26 días.' },
+      { id: 4, fecha: '2023-08-15T14:00:00Z', tipo: 'estado_actualizado', actor: 'Operador BRCcheck', descripcion: { es: 'Estado del caso actualizado a En Resolución. Mediador asignado.', en: 'Case status updated to In Resolution. Mediator assigned.' }, nota: null },
+    ],
   },
   {
     id: 'BRC-003',
@@ -211,10 +241,19 @@ export const MOCK_CASES = [
         titulo: { es: 'Acuerdo de resolución firmado por ambas partes', en: 'Resolution agreement signed by both parties' },
         url: '#', fuente: 'BRCcheck', status: 'verificado',
         quality: { tiene_fecha: true, firmado: true, validacion_cruzada: true, score: 100 },
+        version: 'v1',
+        hash: makeHash('Acuerdo de resolución firmado por ambas partes'),
+        uploaded_at: '2023-04-01T07:00:00Z',
       },
     ],
     status: 'resuelto',
     created_at: '2023-04-01T00:00:00Z',
+    bitacora: [
+      { id: 1, fecha: '2023-04-01T07:00:00Z', tipo: 'notificacion', actor: 'BRCcheck Sistema', descripcion: { es: 'Caso BRC-003 registrado. Notificación formal enviada a Distribuidora Pacífico S.A.', en: 'Case BRC-003 registered. Formal notification sent to Distribuidora Pacífico S.A.' }, nota: null },
+      { id: 2, fecha: '2023-04-10T16:00:00Z', tipo: 'debido_proceso', actor: 'Distribuidora Pacífico', descripcion: { es: 'Empresa respondió dentro del plazo. Evidencia de fuerza mayor presentada.', en: 'Company responded within deadline. Force majeure evidence submitted.' }, nota: 'Respuesta recibida dentro del plazo de 14 días.' },
+      { id: 3, fecha: '2023-04-25T10:00:00Z', tipo: 'estado_actualizado', actor: 'Operador BRCcheck', descripcion: { es: 'Acuerdo de compensación validado. Caso marcado como resuelto.', en: 'Compensation agreement validated. Case marked as resolved.' }, nota: null },
+      { id: 4, fecha: '2023-05-10T09:00:00Z', tipo: 'credencial_emitida', actor: 'BRCcheck Sistema', descripcion: { es: 'Credencial de Cumplimiento Verificado emitida. Folio: CRED-2023-0047.', en: 'Verified Compliance credential issued. Folio: CRED-2023-0047.' }, nota: null },
+    ],
   },
 ]
 

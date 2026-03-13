@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom'
 import {
   BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
 } from 'recharts'
-import { ShieldCheck, FileText, Clock, TrendingUp, Check, X, Eye, Lock } from 'lucide-react'
+import { ShieldCheck, FileText, Clock, TrendingUp, Check, X, Eye, Lock, ChevronDown, ChevronUp } from 'lucide-react'
 import RiskBadge from '../components/RiskBadge'
-import { MOCK_CASES, MOCK_STATS, MOCK_MONTHLY, MOCK_RISK_DIST } from '../lib/mockData'
+import { MOCK_STATS, MOCK_MONTHLY, MOCK_RISK_DIST } from '../lib/mockData'
+import { useCaseStore } from '../lib/caseStore'
 import clsx from 'clsx'
 
 const ADMIN_PASSWORD = 'brc2025'
@@ -56,21 +57,200 @@ function LoginScreen({ onLogin }) {
   )
 }
 
+const STATUS_LABELS = {
+  en_proceso:    { label: 'En Proceso',    color: 'bg-amber-100 text-amber-700 border border-amber-200' },
+  en_resolucion: { label: 'En Resolución', color: 'bg-blue-100 text-blue-700 border border-blue-200' },
+  resuelto:      { label: 'Resuelto',      color: 'bg-green-100 text-green-700 border border-green-200' },
+}
+
+function Toast({ message }) {
+  return (
+    <div className="fixed bottom-6 right-6 z-50 bg-green-600 text-white px-4 py-2.5 text-sm font-semibold shadow-lg">
+      {message}
+    </div>
+  )
+}
+
+function GestionCaseCard({ caso, updateCase, advancePactum, markDueProcessStep, addBitacoraEntry, onSaved }) {
+  const [expanded, setExpanded]   = useState(false)
+  const [pactumNote, setPactumNote] = useState('')
+  const [stepNotes, setStepNotes]  = useState({})
+  const [newStatus, setNewStatus]  = useState(caso.status)
+  const [operatorNote, setOperatorNote] = useState('')
+
+  const statusInfo = STATUS_LABELS[caso.status] || STATUS_LABELS.en_proceso
+
+  function handleAdvancePactum() {
+    advancePactum(caso.id, pactumNote || undefined)
+    setPactumNote('')
+    onSaved()
+  }
+
+  function handleMarkStep(stepKey) {
+    markDueProcessStep(caso.id, stepKey, stepNotes[stepKey] || undefined)
+    setStepNotes(prev => ({ ...prev, [stepKey]: '' }))
+    onSaved()
+  }
+
+  function handleSaveChanges() {
+    if (newStatus !== caso.status) {
+      updateCase(caso.id, { status: newStatus, _nota: operatorNote || undefined })
+    } else if (operatorNote) {
+      addBitacoraEntry(caso.id, {
+        tipo: 'estado_actualizado',
+        actor: 'Operador BRCcheck',
+        descripcion: { es: 'Nota del operador registrada.', en: 'Operator note recorded.' },
+        nota: operatorNote,
+      })
+    }
+    setOperatorNote('')
+    onSaved()
+  }
+
+  return (
+    <div className="bg-white border border-ink-200 overflow-hidden">
+      {/* Card header — always visible */}
+      <button
+        onClick={() => setExpanded(v => !v)}
+        className="w-full px-5 py-4 flex items-center gap-4 hover:bg-ink-50 transition-colors text-left"
+      >
+        <span className="font-mono text-xs text-ink-400 font-bold flex-shrink-0">{caso.folio}</span>
+        <span className="text-sm font-semibold text-navy-900 flex-1 truncate">{typeof caso.titulo === 'object' ? caso.titulo.es : caso.titulo}</span>
+        <span className={clsx('text-[9px] font-black uppercase px-1.5 py-0.5 flex-shrink-0', statusInfo.color)}>
+          {statusInfo.label}
+        </span>
+        <span
+          className="text-[9px] font-black uppercase px-1.5 py-0.5 flex-shrink-0"
+          style={{ background: '#0D737718', color: '#0D7377', border: '1px solid #0D737740' }}
+        >
+          PACTUM L{caso.pactum_nivel}
+        </span>
+        <span className="text-ink-400 flex-shrink-0 ml-2">
+          {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </span>
+      </button>
+
+      {/* Expanded content */}
+      {expanded && (
+        <div className="border-t border-ink-100 px-5 py-5 space-y-6">
+
+          {/* Avanzar PACTUM */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-ink-400 mb-2">Avanzar PACTUM</p>
+            <div className="flex items-center gap-2 flex-wrap mb-2">
+              <span className="text-sm text-ink-600">Nivel actual: <strong>L{caso.pactum_nivel}</strong></span>
+              <button
+                disabled={caso.pactum_nivel >= 4 || caso.status === 'resuelto'}
+                onClick={handleAdvancePactum}
+                className="btn-primary text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Avanzar a L{Math.min(caso.pactum_nivel + 1, 4)}
+              </button>
+            </div>
+            <input
+              type="text"
+              className="input text-xs w-full max-w-sm"
+              placeholder="Nota opcional para esta acción..."
+              value={pactumNote}
+              onChange={e => setPactumNote(e.target.value)}
+            />
+          </div>
+
+          {/* Due process steps */}
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-ink-400 mb-2">Pasos de Debido Proceso</p>
+            <div className="space-y-2">
+              {(caso.due_process || []).map(step => (
+                <div key={step.key} className="flex items-center gap-3 flex-wrap">
+                  <span className={clsx(
+                    'text-[9px] font-bold uppercase px-1.5 py-0.5',
+                    step.status === 'done'   ? 'bg-green-100 text-green-700 border border-green-200' :
+                    step.status === 'active' ? 'bg-teal-100 text-teal-700 border border-teal-200' :
+                                               'bg-ink-100 text-ink-400 border border-ink-200'
+                  )}>
+                    {step.status === 'done' ? '✓ ' : step.status === 'active' ? '● ' : '○ '}
+                    {typeof step.label === 'object' ? step.label.es : step.label}
+                    {step.fecha ? ` (${step.fecha})` : ''}
+                  </span>
+                  {step.status !== 'done' && (
+                    <>
+                      <input
+                        type="text"
+                        className="input text-xs w-40"
+                        placeholder="Nota (opcional)"
+                        value={stepNotes[step.key] || ''}
+                        onChange={e => setStepNotes(prev => ({ ...prev, [step.key]: e.target.value }))}
+                      />
+                      <button
+                        onClick={() => handleMarkStep(step.key)}
+                        className="text-xs font-semibold text-green-700 border border-green-300 px-2 py-1 hover:bg-green-50 transition-colors"
+                      >
+                        Marcar completado
+                      </button>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Status change + note + save */}
+          <div className="space-y-3">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-ink-400">Cambiar estado</p>
+            <select
+              className="input text-sm w-full max-w-xs"
+              value={newStatus}
+              onChange={e => setNewStatus(e.target.value)}
+            >
+              <option value="en_proceso">En Proceso</option>
+              <option value="en_resolucion">En Resolución</option>
+              <option value="resuelto">Resuelto</option>
+            </select>
+            <div>
+              <label className="label">Nota del operador (opcional)</label>
+              <textarea
+                rows={2}
+                className="input resize-none text-sm w-full"
+                placeholder="Escribe una nota para registrar en la bitácora..."
+                value={operatorNote}
+                onChange={e => setOperatorNote(e.target.value)}
+              />
+            </div>
+            <button onClick={handleSaveChanges} className="btn-primary text-sm">
+              Guardar cambios
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPanel() {
   const { t } = useTranslation()
   const [authed, setAuthed] = useState(false)
   const [tab, setTab] = useState('overview')
+  const [toast, setToast] = useState(false)
+  const { cases, companies, updateCase, advancePactum, markDueProcessStep, addBitacoraEntry } = useCaseStore()
 
   const TABS = [
     { id: 'overview',     label: t('admin.tab_overview') },
     { id: 'submissions',  label: t('admin.tab_submissions') },
     { id: 'cases',        label: t('admin.tab_cases') },
+    { id: 'gestion',      label: 'Gestión' },
   ]
+
+  function showToast() {
+    setToast(true)
+    setTimeout(() => setToast(false), 2000)
+  }
 
   if (!authed) return <LoginScreen onLogin={() => setAuthed(true)} />
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {toast && <Toast message="Cambio guardado" />}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6 border-b border-ink-200 pb-5">
         <div>
@@ -172,7 +352,7 @@ export default function AdminPanel() {
                 </tr>
               </thead>
               <tbody>
-                {MOCK_CASES.slice(0, 3).map((c, i) => (
+                {cases.slice(0, 3).map((c, i) => (
                   <tr key={c.id} className="border-b border-ink-50 hover:bg-ink-50 transition-colors">
                     <td className="px-5 py-3 text-ink-400 text-xs font-mono">#{String(i + 1).padStart(3, '0')}</td>
                     <td className="px-5 py-3 text-sm font-semibold text-navy-900">{c.empresa}</td>
@@ -205,7 +385,7 @@ export default function AdminPanel() {
       {tab === 'cases' && (
         <div className="bg-white border border-ink-200 overflow-hidden">
           <div className="px-5 py-3 border-b border-ink-100 bg-ink-50">
-            <p className="section-label">{t('admin.cases_heading')} — {MOCK_CASES.length} {t('admin.cases_records')}</p>
+            <p className="section-label">{t('admin.cases_heading')} — {cases.length} {t('admin.cases_records')}</p>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -217,7 +397,7 @@ export default function AdminPanel() {
                 </tr>
               </thead>
               <tbody>
-                {MOCK_CASES.map((c) => (
+                {cases.map((c) => (
                   <tr key={c.id} className="border-b border-ink-50 hover:bg-ink-50 transition-colors">
                     <td className="px-5 py-3 text-xs text-ink-400 font-mono">#{c.id}</td>
                     <td className="px-5 py-3 text-sm font-semibold text-navy-900 max-w-[200px] truncate">{c.empresa}</td>
@@ -235,6 +415,26 @@ export default function AdminPanel() {
               </tbody>
             </table>
           </div>
+        </div>
+      )}
+
+      {/* Gestión */}
+      {tab === 'gestion' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between mb-2">
+            <p className="section-label">Gestión de Casos — {cases.length} expedientes</p>
+          </div>
+          {cases.map(caso => (
+            <GestionCaseCard
+              key={caso.id}
+              caso={caso}
+              updateCase={updateCase}
+              advancePactum={advancePactum}
+              markDueProcessStep={markDueProcessStep}
+              addBitacoraEntry={addBitacoraEntry}
+              onSaved={showToast}
+            />
+          ))}
         </div>
       )}
     </div>

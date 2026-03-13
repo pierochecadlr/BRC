@@ -6,7 +6,8 @@ import jsPDF from 'jspdf'
 import html2canvas from 'html2canvas'
 import ReputationScore from '../components/ReputationScore'
 import RsBadge from '../components/RsBadge'
-import { MOCK_COMPANIES, MOCK_CASES, rsColor, lf } from '../lib/mockData'
+import { rsColor, lf } from '../lib/mockData'
+import { useCaseStore } from '../lib/caseStore'
 
 function fmt(d) {
   try { return new Date(d).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) }
@@ -36,8 +37,9 @@ export default function CompanyProfile() {
   const { t, i18n } = useTranslation()
   const lang = i18n.language?.startsWith('es') ? 'es' : 'en'
 
-  const company = MOCK_COMPANIES.find(c => c.id === id)
-  const cases   = MOCK_CASES.filter(c => c.empresa_id === id)
+  const { cases: allCases, companies } = useCaseStore()
+  const company = companies.find(c => c.id === id)
+  const cases   = allCases.filter(c => c.empresa_id === id)
 
   if (!company) return (
     <div className="max-w-5xl mx-auto px-5 py-20 text-center text-ink-400">

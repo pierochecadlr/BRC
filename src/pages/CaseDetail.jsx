@@ -3,11 +3,18 @@ import { useParams, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Download, CheckCircle, Sparkles, Loader } from 'lucide-react'
 import RiskBadge from '../components/RiskBadge'
-import { MOCK_CASES, MOCK_COMPANIES, lf } from '../lib/mockData'
+import Bitacora from '../components/Bitacora'
+import { lf } from '../lib/mockData'
+import { useCaseStore } from '../lib/caseStore'
 import { generateCaseSummary } from '../lib/claude'
 
 function fmt(d) {
   try { return new Date(d).toLocaleDateString('es-MX', { day: '2-digit', month: 'long', year: 'numeric' }) }
+  catch { return d }
+}
+
+function fmtShort(d) {
+  try { return new Date(d).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' }) }
   catch { return d }
 }
 
@@ -109,8 +116,9 @@ export default function CaseDetail() {
   const { id } = useParams()
   const { t, i18n } = useTranslation()
   const lang = i18n.language?.startsWith('es') ? 'es' : 'en'
-  const caso = MOCK_CASES.find(c => c.id === id)
-  const company = caso ? MOCK_COMPANIES.find(co => co.id === caso.empresa_id) : null
+  const { cases, companies } = useCaseStore()
+  const caso = cases.find(c => c.id === id)
+  const company = caso ? companies.find(co => co.id === caso.empresa_id) : null
   const [reply, setReply] = useState({ name: '', company: '', email: '', message: '' })
   const [sent, setSent]   = useState(false)
   const [summary, setSummary]     = useState('')
@@ -220,6 +228,11 @@ export default function CaseDetail() {
                       <span className="text-[10px] font-black uppercase px-1.5 py-0.5 bg-navy-100 text-navy-700 flex-shrink-0">
                         {ev.tipo}
                       </span>
+                      {ev.version && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 bg-navy-100 text-navy-600 border border-navy-200 flex-shrink-0">
+                          {ev.version}
+                        </span>
+                      )}
                       <p className="text-sm text-ink-700 flex-1">{lf(ev.titulo, lang)}</p>
                       <span className="text-[10px] text-ink-400 font-semibold flex-shrink-0">{ev.fuente}</span>
                       {ev.status && (
@@ -233,12 +246,36 @@ export default function CaseDetail() {
                         </span>
                       )}
                     </div>
+                    {/* Hash + upload timestamp */}
+                    {(ev.hash || ev.uploaded_at) && (
+                      <div className="flex items-center gap-4 mt-2 flex-wrap">
+                        {ev.hash && (
+                          <span className="font-mono text-[10px] text-ink-400">
+                            {ev.hash.slice(0, 15)}…
+                          </span>
+                        )}
+                        {ev.uploaded_at && (
+                          <span className="text-[10px] text-ink-400">
+                            Subido: {fmtShort(ev.uploaded_at)}
+                          </span>
+                        )}
+                      </div>
+                    )}
                     {ev.quality && <EvidenceQuality ev={ev} lang={lang} t={t} />}
                   </div>
                 ))}
               </div>
             </div>
           )}
+
+          {/* Bitácora de Acciones */}
+          <div>
+            <SectionHeading>Bitácora de Acciones</SectionHeading>
+            <Bitacora
+              entries={caso.bitacora || []}
+              lang={lang}
+            />
+          </div>
 
           {/* AI Case Summary */}
           <div>
