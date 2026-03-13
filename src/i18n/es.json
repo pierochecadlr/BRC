@@ -96,7 +96,8 @@
     "proof_integrity": "Capa de Verificación",
     "due_process": "Motor de Debido Proceso",
     "resolution": "Pipeline PACTUM",
-    "credentials": "Credenciales de Cumplimiento"
+    "credentials": "Credenciales de Cumplimiento",
+    "bitacora": "Bitácora de Acciones"
   },
   "pactum": {
     "title": "Pipeline de Resolución PACTUM",
@@ -122,7 +123,8 @@
     "high_risk": "Riesgo Alto",
     "no_cases": "Sin antecedentes. Perfil limpio.",
     "credential_title": "Cumplimiento Verificado — BRCcheck",
-    "credential_desc": "{{n}} credencial(es) de cumplimiento emitida(s)"
+    "credential_desc": "{{n}} credencial(es) de cumplimiento emitida(s)",
+    "download_credential": "Descargar Credencial PDF"
   },
   "evidence_quality": {
     "title": "Calidad de Evidencia",
@@ -268,6 +270,7 @@
     "send": "Enviar",
     "thinking": "Analizando...",
     "open": "¿Tienes un caso?",
-    "disclaimer": "Orientación general. No sustituye asesoría legal."
+    "disclaimer": "Orientación general. No sustituye asesoría legal.",
+    "greeting": "¡Hola! Soy el asistente de BRCcheck. ¿En qué te puedo orientar? Puedo ayudarte a saber si tu caso califica o qué evidencia necesitas."
   }
 }

@@ -20,6 +20,10 @@ export default function ChatBot() {
   const bottomRef = useRef(null)
 
   useEffect(() => {
+    setMessages([{ role: 'bot', text: t('chatbot.greeting') }])
+  }, [lang])
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, open])
 

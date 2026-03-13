@@ -96,7 +96,8 @@
     "proof_integrity": "Proof-of-Integrity Layer",
     "due_process": "Due Process Engine",
     "resolution": "Resolution Pipeline",
-    "credentials": "Compliance Credentials"
+    "credentials": "Compliance Credentials",
+    "bitacora": "Action Log"
   },
   "pactum": {
     "title": "PACTUM Resolution Pipeline",
@@ -122,7 +123,8 @@
     "high_risk": "High Risk",
     "no_cases": "No records. Clean profile.",
     "credential_title": "Verified Compliance — BRCcheck",
-    "credential_desc": "{{n}} compliance credential(s) issued"
+    "credential_desc": "{{n}} compliance credential(s) issued",
+    "download_credential": "Download Credential PDF"
   },
   "evidence_quality": {
     "title": "Evidence Quality",
@@ -268,6 +270,7 @@
     "send": "Send",
     "thinking": "Analyzing...",
     "open": "Have a case?",
-    "disclaimer": "General guidance only. Not a substitute for legal advice."
+    "disclaimer": "General guidance only. Not a substitute for legal advice.",
+    "greeting": "Hi! I'm the BRCcheck assistant. How can I help? I can tell you if your case qualifies or what evidence you need."
   }
 }

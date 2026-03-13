@@ -164,7 +164,7 @@ export default function CaseDetail() {
             <h1 className="text-xl font-bold text-navy-950 leading-snug">{lf(caso.titulo, lang)}</h1>
           </div>
           <Link to={`/caso/${caso.id}/report`} className="btn-primary flex items-center gap-2 flex-shrink-0">
-            <Download size={13} /> PDF
+            <Download size={13} /> {t('case_detail.download_pdf')}
           </Link>
         </div>
         <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs text-ink-500">
@@ -270,7 +270,7 @@ export default function CaseDetail() {
 
           {/* Bitácora de Acciones */}
           <div>
-            <SectionHeading>Bitácora de Acciones</SectionHeading>
+            <SectionHeading>{t('modules.bitacora')}</SectionHeading>
             <Bitacora
               entries={caso.bitacora || []}
               lang={lang}
@@ -346,7 +346,7 @@ export default function CaseDetail() {
               <p className="text-xs font-bold uppercase tracking-widest text-green-700 mb-2">
                 {t('modules.credentials')}
               </p>
-              <p className="text-sm font-bold text-green-900">Cumplimiento Verificado — BRCcheck</p>
+              <p className="text-sm font-bold text-green-900">{t('company.credential_title')}</p>
               <p className="text-[10px] text-green-700 font-mono mt-1">#{caso.credencial.folio}</p>
               <p className="text-[10px] text-green-600 mt-1">{fmt(caso.credencial.emitida)}</p>
             </div>

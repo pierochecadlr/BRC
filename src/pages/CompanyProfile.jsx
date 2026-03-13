@@ -160,7 +160,7 @@ export default function CompanyProfile() {
                 onClick={() => downloadCredential(resolvedCases.find(rc => rc.credencial))}
                 className="flex items-center gap-1.5 text-xs font-semibold text-green-700 border border-green-300 px-3 py-1.5 hover:bg-green-100 transition-colors"
               >
-                <Download size={11} /> Descargar credencial PDF
+                <Download size={11} /> {t('company.download_credential')}
               </button>
             </div>
           )}

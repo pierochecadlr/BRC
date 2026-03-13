@@ -12,6 +12,7 @@ i18n
       es: { translation: es },
       en: { translation: en },
     },
+    lng: 'es',
     fallbackLng: 'es',
     supportedLngs: ['es', 'en'],
     // Treat en-US, en-GB, es-MX, etc. as their base language
